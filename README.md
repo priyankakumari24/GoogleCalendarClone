@@ -1,4 +1,4 @@
-# Calendar Clone (Advanced)
+# Calendar Clone
 
 A Google Calendar-like Django application with FullCalendar integration, a date sidebar and a "Smart Dashboard". This README documents features, libraries, architecture and design decisions, setup and run instructions, business logic and edge cases handled, notes on animations/interactions, and suggested future enhancements.
 
@@ -19,17 +19,24 @@ Features & libraries
 
 Features
 - Full month / week / day calendar views powered by FullCalendar
-- Sidebar with minicalendar and quick date navigation
-- Create / edit / delete events with modal UI
-- Drag & drop and resize events (persisted)
-- Event categories / color labels
-- Search/filter events client-side
-- Mini "Smart Dashboard" showing upcoming events, today timeline, suggestions, quick-add, notifications and a focus timer
-- Weather snippet for selected day (Open-Meteo)
-- Toast notifications for user feedback
-- Recurrence field (RRULE) support in event model (backend read/write expected)
-- CSRF-safe AJAX via axios
-- Seed data helper for local development
+- Smart dashboard with:
+  - Upcoming events list
+  - Today's timeline
+  - Weather information
+  - Focus timer
+  - Quick add events
+  - Real-time notifications
+- Mini calendar with date navigation
+- Create/edit/delete events with modal UI
+- Drag & drop event scheduling
+- Event resize for duration changes
+- Color-coded event categories
+- Client-side event search/filter
+- Weather integration (Open-Meteo API)
+- Bootstrap toast notifications
+- RRULE support for recurring events
+- CSRF-safe AJAX operations
+- Sample event seeder
 
 Main third-party libraries used
 - Django (backend)
@@ -202,6 +209,7 @@ Animations and interactions (how implemented)
   - CSS transitions applied to theme/background color changes and iframe/dashboard hover to make interaction feel responsive.
 - Revert on failed server update:
   - When a drag/resize triggers a PUT to the server that fails, the frontend calls event.revert() to restore the previous position.
+
 
 ---
 

@@ -1,0 +1,885 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Google Calendar Clone - Advanced</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- FullCalendar -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet" />
+
+  <style>
+    /* 🌙 Dark Google Calendar Clone with Advanced Features */
+    :root {
+      --bg: #f6f8fc;
+      --card: #fff;
+      --text: #202124;
+      --muted: #6b6f76;
+      --accent: #1a73e8;
+      --sidebar-bg: #f0f0f0;
+      --border: #e0e0e0;
+    }
+    
+    .dark {
+      --bg: #202124;
+      --card: #2a2c2f;
+      --text: #e8eaed;
+      --muted: #c2c6c9;
+      --accent: #8ab4f8;
+      --sidebar-bg: #171717;
+      --border: #3c4043;
+    }
+
+    body {
+      margin: 0;
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      height: 100vh;
+      display: flex;
+      overflow: hidden;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    /* 🔹 Sidebar */
+    .sidebar {
+      width: 25%;
+      background-color: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      overflow-y: auto;
+      transition: background-color 0.3s;
+    }
+
+    .sidebar h2 {
+      color: var(--text);
+      font-weight: 600;
+      font-size: 22px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .sidebar .controls {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .sidebar button.create-btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      font-weight: 600;
+      padding: 10px 18px;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .sidebar button.create-btn:hover {
+      opacity: 0.9;
+    }
+
+    .theme-toggle-wrapper {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .theme-toggle-wrapper label {
+      font-size: 13px;
+      color: var(--muted);
+      margin: 0;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--card);
+      color: var(--text);
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+
+    .mini-legend {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .month-title {
+      color: var(--text);
+      font-weight: 600;
+      margin-top: 16px;
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+/* 🗓️ Mini Calendar Styling (Compact Grid, Taller Box) */
+#miniCalendar {
+  background-color: var(--card);
+  border-radius: 10px;
+  padding: 8px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+  margin-bottom: 20px;
+  width: 100%;
+  max-height: 320px;  /* ⬆️ Increased overall box height */
+  overflow: hidden;
+}
+
+#miniCalendar .fc {
+  background-color: transparent !important;
+  font-size: 12px !important;
+  min-height: none !important;
+}
+
+#miniCalendar .fc-daygrid-day-frame {
+  background-color: transparent !important;
+  border-color: var(--border) !important;
+  min-height: 22px !important;  /* ⬇️ Reduced individual cell height */
+  text-align: center;
+  padding: 1px 0 !important;
+}
+
+#miniCalendar .fc-daygrid-day-number {
+  color: var(--text) !important;
+  font-size: 12px !important;
+  font-weight: 500;
+  padding: 2px;
+}
+
+#miniCalendar .fc-daygrid-day.fc-day-today {
+  background: var(--accent);
+  color: white !important;
+  border-radius: 50%;
+}
+
+#miniCalendar .fc-toolbar {
+  display: none !important;
+}
+
+#miniCalendar .fc-scrollgrid-sync-inner {
+  padding: 1px 0 !important;
+}
+
+#miniCalendar .fc-col-header-cell-cushion {
+  color: var(--muted) !important;
+  font-size: 11px !important;
+  font-weight: 500;
+  padding: 3px 0 !important;
+  text-transform: uppercase;
+}
+
+#miniCalendar .fc-day-other {
+  opacity: 0.4 !important;
+}
+
+/* Hover effect */
+#miniCalendar .fc-daygrid-day:hover {
+  background-color: rgba(26, 115, 232, 0.08);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+    .weather-box {
+      background: var(--card);
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 16px;
+    }
+
+    .weather-box h6 {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .weather-box #weatherLoading {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .sidebar hr {
+      border-color: var(--border);
+      margin: 16px 0;
+    }
+
+    .sidebar small {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* 🔹 Main calendar area */
+    .calendar-container {
+      flex: 1;
+      background-color: var(--bg);
+      padding: 20px;
+      overflow: auto;
+    }
+
+    #calendar {
+      width: 100%;
+      height: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      background: var(--card);
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    }
+
+    /* FullCalendar dark theme */
+    .fc {
+      background-color: var(--card);
+      color: var(--text);
+    }
+
+    .fc-toolbar-title {
+      color: var(--text);
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .fc-button {
+      background-color: transparent !important;
+      color: var(--text) !important;
+      border: 1px solid var(--border) !important;
+      border-radius: 6px !important;
+    }
+
+    .fc-button:hover {
+      background-color: var(--muted) !important;
+    }
+
+    .fc-button-active {
+      background-color: var(--accent) !important;
+      color: white !important;
+      border-color: transparent !important;
+    }
+
+    .fc-col-header-cell {
+      background-color: var(--sidebar-bg) !important;
+      color: var(--muted) !important;
+      border-color: var(--border) !important;
+    }
+
+    .fc-daygrid-day-frame {
+      background-color: var(--card);
+      border-color: var(--border);
+    }
+
+    .fc-daygrid-day-number {
+      color: var(--text) !important;
+    }
+
+    /* 🔹 Event styling */
+    .fc-event {
+      border: none !important;
+      border-radius: 6px !important;
+      padding: 3px 6px !important;
+      color: white !important;
+      font-weight: 500;
+      font-size: 13px;
+    }
+
+    /* 🗓️ Week Number Column */
+    .fc-daygrid-week-number {
+      background-color: var(--sidebar-bg) !important;
+      color: var(--text) !important;
+      font-weight: 400;
+      text-align: center;
+      border-right: 1px solid var(--border) !important;
+      width: 80px;
+    }
+
+    .fc-daygrid-week-number span {
+      display: block;
+      background-color: var(--border);
+      border-radius: 6px;
+      padding: 4px 0;
+      margin: 4px auto;
+      width: 70%;
+    }
+
+    .fc-daygrid-week-number span:hover {
+      background-color: var(--accent);
+      color: white;
+      cursor: pointer;
+    }
+
+    /* Toast area */
+    #toastContainer { 
+      position: fixed; 
+      right: 18px; 
+      bottom: 18px; 
+      z-index: 2000; 
+    }
+
+    /* Modal styling */
+    .modal-content {
+      background: var(--card);
+      color: var(--text);
+    }
+
+    .modal-header {
+      border-bottom-color: var(--border);
+    }
+
+    .modal-footer {
+      border-top-color: var(--border);
+    }
+
+    .form-control, .form-select {
+      background: var(--card);
+      color: var(--text);
+      border-color: var(--border);
+    }
+
+    .form-control:focus {
+      background: var(--card);
+      color: var(--text);
+      border-color: var(--accent);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--muted);
+      border-radius: 10px;
+    }
+
+    .main-wrapper {
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#dashboardPanel iframe {
+  transition: all 0.3s ease;
+}
+
+#dashboardPanel {
+  box-shadow: -4px 0 8px rgba(0,0,0,0.05);
+  width: 35%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+    /* Mobile responsive */
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      #calendar { padding: 8px; margin: 8px; box-shadow: none; border-radius: 6px; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- 🔹 Sidebar -->
+  <div class="sidebar">
+    <h2>📆 Calendar</h2>
+    
+    <div class="controls">
+      <button id="createEventBtn" class="create-btn">+ Create</button>
+      <div class="theme-toggle-wrapper">
+        {% comment %} <input class="form-check-input" type="checkbox" id="themeToggle">
+        <label class="form-check-label" for="themeToggle">Dark</label> {% endcomment %}
+      </div>
+    </div>
+
+    <input id="searchInput" class="search-box" type="search" placeholder="Search events..." />
+
+    <div class="mini-legend">
+      <div class="badge bg-primary">Work</div>
+      <div class="badge bg-success">Personal</div>
+      <div class="badge" style="background:#fbbc04;color:black">Holiday</div>
+      <div class="badge bg-secondary">Other</div>
+    </div>
+
+    <div class="month-title" id="monthTitle"></div>
+    <div id="miniCalendar" style = 'min-height: 250px'></div>
+
+    <hr>
+
+    <div class="weather-box">
+      <h6>Weather (selected day)</h6>
+      <div id="weatherLoading">Select a day to load weather</div>
+    </div>
+
+    <hr>
+
+    <small>Tip: drag events to move them or resize to change duration. Changes auto-save.</small>
+  </div>
+
+<!-- 🔹 Main Calendar + Dashboard -->
+<div class="main-content" style="display:flex; height:100%; width:100%;">
+
+  <!-- Center Calendar -->
+  <div class="calendar-container" style="flex:1; overflow:auto;">
+    <div id="calendar"></div>
+  </div>
+</div>
+  <!-- Right Dashboard Panel -->
+  <aside id="dashboardPanel" style="
+   
+  ">
+    <iframe 
+      src="{% url 'dashboard' %}" 
+      style="width:100%; height:100%; border:none;" 
+      title="Smart Dashboard">
+    </iframe>
+  </aside>
+
+
+
+  <!-- TOAST container -->
+  <div id="toastContainer" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Modal for Add / Edit -->
+  <div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <form id="eventForm">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalTitle">Create event</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+
+          <div class="modal-body">
+            {% csrf_token %}
+            <input type="hidden" id="eventId" />
+
+            <div class="row g-2">
+              <div class="col-md-8">
+                <label class="form-label">Title</label>
+                <input id="evTitle" class="form-control" required />
+              </div>
+              <div class="col-md-4">
+                <label class="form-label">Category color</label>
+                <input id="evColor" type="color" class="form-control form-control-color" value="#4285f4" title="Choose color">
+              </div>
+            </div>
+
+            <div class="row g-2 mt-2">
+              <div class="col-md-6">
+                <label class="form-label">Start</label>
+                <input id="evStart" type="datetime-local" class="form-control" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">End</label>
+                <input id="evEnd" type="datetime-local" class="form-control" required />
+              </div>
+            </div>
+
+            <div class="form-check mt-2">
+              <input id="evAllDay" type="checkbox" class="form-check-input" />
+              <label class="form-check-label">All day</label>
+            </div>
+
+            <div class="mt-2">
+              <label class="form-label">Description</label>
+              <textarea id="evDesc" class="form-control" rows="3"></textarea>
+            </div>
+
+            <div class="row g-2 mt-2">
+              <div class="col-md-6">
+                <label class="form-label">Location (address)</label>
+                <input id="evLocation" class="form-control" placeholder="e.g. Connaught Place, New Delhi" />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Recurrence (RRULE)</label>
+                <input id="evRrule" class="form-control" placeholder="e.g. FREQ=WEEKLY;BYDAY=MO,WE,FR" />
+                <small class="text-muted">Optional. Example: <code>FREQ=WEEKLY;BYDAY=MO</code></small>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="modal-footer">
+            <button id="deleteBtn" type="button" class="btn btn-outline-danger me-auto d-none">Delete</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button id="saveBtn" type="submit" class="btn btn-primary">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ✅ Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // ---------- Config ----------
+    const API_BASE = '/api/events/';
+    const FALLBACK_COORDS = { lat: 28.644800, lon: 77.216721 }; // Delhi
+    const WEATHER_API = (lat, lon, dateISO) => `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&start_date=${dateISO}&end_date=${dateISO}&daily=temperature_2m_max,temperature_2m_min&timezone=Asia%2FKolkata`;
+
+    // ---------- CSRF for axios ----------
+    function getCookie(name) {
+      const v = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+      return v ? v.pop() : '';
+    }
+    axios.defaults.headers.common['X-CSRFToken'] = getCookie('csrftoken');
+
+    // ---------- Helper: Toast ----------
+    function showToast(message, title = '', type = 'primary') {
+      const id = 't' + Date.now();
+      const toastHtml = `
+        <div id="${id}" class="toast align-items-center text-bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body">
+              ${title ? '<strong>' + title + '</strong><br/>' : ''}${message}
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>`;
+      const container = document.getElementById('toastContainer');
+      container.insertAdjacentHTML('beforeend', toastHtml);
+      const tEl = document.getElementById(id);
+      const toast = new bootstrap.Toast(tEl);
+      toast.show();
+      tEl.addEventListener('hidden.bs.toast', () => tEl.remove());
+    }
+
+    // ---------- Theme toggling ----------
+    {% comment %} const themeToggle = document.getElementById('themeToggle');
+    function applyTheme(dark) {
+      if (dark) document.documentElement.classList.add('dark');
+      else document.documentElement.classList.remove('dark');
+      localStorage.setItem('calendar_dark', dark ? '1' : '0');
+      themeToggle.checked = !!dark;
+    }
+    applyTheme(localStorage.getItem('calendar_dark') === '1');
+    themeToggle.addEventListener('change', (e) => applyTheme(e.target.checked)); {% endcomment %}
+
+    // ---------- Create bootstrap modal instance ----------
+    const eventModalEl = document.getElementById('eventModal');
+    const bsModal = new bootstrap.Modal(eventModalEl, { backdrop: 'static' });
+
+    // ---------- FullCalendar setup ----------
+    let mainCalendar;
+    let miniCalendar;
+
+    function toLocalDatetimeInput(dtISO) {
+      if (!dtISO) return '';
+      const d = new Date(dtISO);
+      const tzOffset = d.getTimezoneOffset() * 60000;
+      const localISO = new Date(d - tzOffset).toISOString().slice(0,16);
+      return localISO;
+    }
+
+    function fromLocalInputToISO(value) {
+      if (!value) return null;
+      const dt = new Date(value);
+      return dt.toISOString();
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      const calendarEl = document.getElementById('calendar');
+      const miniCalendarEl = document.getElementById('miniCalendar');
+      const monthTitle = document.getElementById('monthTitle');
+
+      // 🗓️ Main calendar with week numbers
+      mainCalendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        height: '100%',
+        weekNumbers: true,
+        weekNumbersWithinDays: false,
+        weekNumberContent: function (arg) {
+          return { html: `<span>Week ${arg.num}</span>` };
+        },
+        headerToolbar: {
+          left: 'prev,next today',
+          center: 'title',
+          right: 'dayGridMonth,timeGridWeek,timeGridDay'
+        },
+        nowIndicator: true,
+        editable: true,
+        selectable: true,
+        selectMirror: true,
+        businessHours: true,
+        dayMaxEvents: true,
+        eventResizableFromStart: true,
+
+        // Load events
+        events: function(info, successCallback, failureCallback) {
+            const params = new URLSearchParams();
+            params.set('start', info.startStr);
+            params.set('end', info.endStr);
+
+            axios.get(API_BASE + '?' + params.toString())
+              .then(res => {
+      // Normalize fields — handle any backend format
+      
+      const raw = Array.isArray(res.data)
+        ? res.data
+        : res.data.results || [];
+
+      const events = raw.map(e => ({
+        id: e.id || e.pk || null,
+        title: e.title || e.name || 'Untitled Event',
+        start: e.start || e.start_time || e.begin || e.date,
+        end: e.end || e.end_time || e.finish || e.date,
+        allDay: e.allDay || e.all_day || false,
+        backgroundColor: e.color || e.backgroundColor || '#4285f4',
+        extendedProps: {
+          description: e.description || e.desc || '',
+          location: e.location || '',
+          rrule: e.recurrence_rule || e.rrule || ''
+        }
+      }));
+
+      console.log("✅ Events loaded:", events);
+      successCallback(events);
+    })
+    .catch(err => {
+      console.error('❌ Error fetching events', err);
+      failureCallback(err);
+    });
+  },
+
+
+        datesSet: function (info) {
+          const currentDate = info.start;
+          monthTitle.textContent = currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
+          miniCalendar.gotoDate(currentDate);
+        },
+
+        select: function(selectionInfo) {
+          document.getElementById('modalTitle').textContent = 'Create event';
+          document.getElementById('eventId').value = '';
+          document.getElementById('evTitle').value = '';
+          document.getElementById('evDesc').value = '';
+          document.getElementById('evColor').value = '#4285f4';
+          document.getElementById('evAllDay').checked = selectionInfo.allDay || false;
+          document.getElementById('evStart').value = toLocalDatetimeInput(selectionInfo.startStr);
+          document.getElementById('evEnd').value = toLocalDatetimeInput(selectionInfo.endStr || selectionInfo.startStr);
+          document.getElementById('evLocation').value = '';
+          document.getElementById('evRrule').value = '';
+          document.getElementById('deleteBtn').classList.add('d-none');
+          bsModal.show();
+          loadWeatherForDate(selectionInfo.startStr);
+        },
+
+        eventClick: function(clickInfo) {
+          const ev = clickInfo.event;
+          document.getElementById('modalTitle').textContent = 'Edit event';
+          document.getElementById('eventId').value = ev.id;
+          document.getElementById('evTitle').value = ev.title || '';
+          document.getElementById('evDesc').value = ev.extendedProps?.description || '';
+          document.getElementById('evColor').value = ev.backgroundColor || '#4285f4';
+          document.getElementById('evAllDay').checked = ev.allDay || false;
+          document.getElementById('evStart').value = toLocalDatetimeInput(ev.start?.toISOString());
+          document.getElementById('evEnd').value = toLocalDatetimeInput(ev.end?.toISOString() || ev.start?.toISOString());
+          document.getElementById('evLocation').value = ev.extendedProps?.location || '';
+          document.getElementById('evRrule').value = ev.extendedProps?.rrule || '';
+          document.getElementById('deleteBtn').classList.remove('d-none');
+          bsModal.show();
+          loadWeatherForDate(ev.start?.toISOString());
+        },
+
+        eventDrop: function(info) {
+          handleEventMoveOrResize(info.event, 'move');
+        },
+
+        eventResize: function(info) {
+          handleEventMoveOrResize(info.event, 'resize');
+        },
+
+        eventDidMount: function (info) {
+          if (info.event.title && info.event.title.includes("🇮🇳")) {
+            info.el.style.backgroundColor = "#fbbc04";
+            info.el.style.color = "black";
+          }
+        }
+      });
+
+      // 📅 Mini Calendar
+      miniCalendar = new FullCalendar.Calendar(miniCalendarEl, {
+        initialView: 'dayGridMonth',
+        selectable: true,
+        showNonCurrentDates: false,
+        dateClick: function (info) {
+          mainCalendar.gotoDate(info.date);
+          loadWeatherForDate(info.dateStr);
+        }
+      });
+
+      mainCalendar.render();
+      miniCalendar.render();
+
+      // ---------- Search filtering ----------
+      const searchInput = document.getElementById('searchInput');
+      let searchTimer = null;
+      searchInput.addEventListener('input', (e) => {
+        if (searchTimer) clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => {
+          const q = e.target.value.trim().toLowerCase();
+          if (!q) {
+            mainCalendar.refetchEvents();
+            return;
+          }
+          const all = mainCalendar.getEvents();
+          all.forEach(ev => {
+            const keep = (ev.title || '').toLowerCase().includes(q) || 
+                        (ev.extendedProps?.description || '').toLowerCase().includes(q);
+            ev.setProp('display', keep ? 'auto' : 'none');
+          });
+        }, 300);
+      });
+
+      // ---------- Create button ----------
+      document.getElementById('createEventBtn').addEventListener('click', () => {
+        mainCalendar.unselect();
+        document.getElementById('modalTitle').textContent = 'Create event';
+        document.getElementById('eventId').value = '';
+        document.getElementById('evTitle').value = '';
+        document.getElementById('evDesc').value = '';
+        document.getElementById('evStart').value = '';
+        document.getElementById('evEnd').value = '';
+        document.getElementById('evColor').value = '#4285f4';
+        document.getElementById('evAllDay').checked = false;
+        document.getElementById('evLocation').value = '';
+        document.getElementById('evRrule').value = '';
+        document.getElementById('deleteBtn').classList.add('d-none');
+        bsModal.show();
+      });
+
+      // ---------- Save (create or update) ----------
+      document.getElementById('eventForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = document.getElementById('eventId').value;
+        const payload = {
+          title: document.getElementById('evTitle').value,
+          description: document.getElementById('evDesc').value,
+          start: fromLocalInputToISO(document.getElementById('evStart').value),
+          end: fromLocalInputToISO(document.getElementById('evEnd').value),
+          allDay: document.getElementById('evAllDay').checked,
+          color: document.getElementById('evColor').value,
+          location: document.getElementById('evLocation').value,
+          recurrence_rule: document.getElementById('evRrule').value
+        };
+
+        try {
+          if (id) {
+            await axios.put(API_BASE + id + '/', payload);
+            showToast('Event updated', '', 'success');
+          } else {
+            await axios.post(API_BASE, payload);
+            showToast('Event created', '', 'success');
+          }
+          mainCalendar.addEvent(payload); // instantly show event without waiting for refetch
+
+          bsModal.hide();
+          mainCalendar.refetchEvents();
+        } catch (err) {
+          console.error(err);
+          showToast('Unable to save event: ' + (err?.response?.data || err.message), 'Error', 'danger');
+        }
+      });
+
+      // ---------- Delete ----------
+      document.getElementById('deleteBtn').addEventListener('click', async () => {
+        // read id at click time
+        const id = (document.getElementById('eventId').value || '').toString().trim();
+        if (!id) {
+          showToast('Unable to delete: event has no ID', 'Error', 'danger');
+          return;
+        }
+        if (!confirm('Delete this event?')) return;
+        try {
+          await axios.delete(API_BASE + id + '/');
+          showToast('Event deleted', '', 'warning');
+          // remove any matching event currently in the calendar immediately
+          const ev = mainCalendar.getEventById(id);
+          if (ev) ev.remove();
+          bsModal.hide();
+          // keep in sync with server
+          mainCalendar.refetchEvents();
+        } catch (err) {
+          console.error(err);
+          showToast('Unable to delete: ' + (err?.response?.data || err.message), 'Error', 'danger');
+        }
+      }); 
+      
+
+
+
+      // ---------- Move/Resize handler ----------
+      async function handleEventMoveOrResize(ev, why) {
+        const payload = {
+          start: ev.start ? ev.start.toISOString() : null,
+          end: ev.end ? ev.end.toISOString() : null,
+          allDay: ev.allDay
+        };
+        if (!ev.id) {
+          showToast('This event has no ID and cannot be saved', 'Error', 'danger');
+          return;
+        }
+        try {
+          await axios.put(API_BASE + ev.id + '/', payload);
+          showToast('Event ' + (why === 'move' ? 'moved' : 'resized'), '', 'success');
+          mainCalendar.refetchEvents();
+        } catch (err) {
+          console.error(err);
+          showToast('Unable to save change: ' + (err?.response?.data || err.message), 'danger');
+          ev.revert();
+        }
+      }
+
+      // ---------- Weather fetch for a single date ----------
+      async function loadWeatherForDate(isoDate) {
+        const box = document.getElementById('weatherLoading');
+        box.innerHTML = 'Loading weather...';
+        const lat = FALLBACK_COORDS.lat;
+        const lon = FALLBACK_COORDS.lon;
+
+        const d = new Date(isoDate);
+        if (isNaN(d)) { box.innerHTML = 'Invalid date for weather'; return; }
+        const dateStr = d.toISOString().slice(0,10);
+        try {
+          const res = await fetch(WEATHER_API(lat, lon, dateStr));
+          const j = await res.json();
+          if (j && j.daily) {
+            const tmax = j.daily.temperature_2m_max[0];
+            const tmin = j.daily.temperature_2m_min[0];
+            box.innerHTML = `<div><strong>${dateStr}</strong> &middot; Max ${tmax}°C / Min ${tmin}°C (Delhi)</div>`;
+          } else {
+            box.innerHTML = 'No weather data';
+          }
+        } catch (err) {
+          console.warn('Weather error', err);
+          box.innerHTML = 'Weather fetch failed';
+        }
+      }
+
+      // ESC key to close modal
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') bsModal.hide();
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=400, initial-scale=1.0">  <!-- ✅ prevents horizontal scroll -->
+  <title>Smart Calendar Dashboard</title>
+
+  <link rel="stylesheet" href="{% static 'events/css/dashboard.css' %}">
+  
+  <style>
+    /* ✅ Add inline safety styles for iframe embedding */
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow-x: hidden;
+      background: var(--card, #fff);
+      color: var(--text, #202124);
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+    }
+
+    .dashboard-container {
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      padding: 16px;
+      overflow-y: auto; /* scroll vertically only */
+    }
+
+    .widget {
+      background: var(--card, #fff);
+      border: 1px solid rgba(0,0,0,0.05);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      padding: 12px 16px;
+      margin-bottom: 16px;
+    }
+
+    .widget h2 {
+      margin-top: 0;
+      font-size: 16px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="dashboard-container">
+    <header>
+      <h1>Smart Calendar Dashboard</h1>
+      <p>Powered by your event data & smart widgets</p>
+    </header>
+
+    <main>
+      <section id="upcoming-events" class="widget">
+        <h2>🗓 Upcoming Events</h2>
+        <ul id="upcomingList"><li>Loading...</li></ul>
+      </section>
+
+      <section id="weather" class="widget">
+        <h2>🌤 Weather Forecast</h2>
+        <div id="weatherBox">Loading weather...</div>
+      </section>
+
+      <section id="today-timeline" class="widget">
+        <h2>🕒 Today’s Schedule</h2>
+        <ul id="todayList"><li>No events yet</li></ul>
+      </section>
+
+      <section id="smart-suggestions" class="widget">
+        <h2>💡 Smart Suggestions</h2>
+        <ul id="suggestionsList"><li>Analyzing your calendar...</li></ul>
+      </section>
+
+      <section id="quick-add" class="widget">
+        <h2>⚡ Quick Add</h2>
+        <input type="text" id="quickAddInput" placeholder="e.g. Meeting tomorrow 3pm">
+        <button id="quickAddBtn">+ Add Event</button>
+      </section>
+
+      <section id="notifications" class="widget">
+        <h2>🔔 Notifications</h2>
+        <ul id="notificationsList"><li>No recent updates</li></ul>
+      </section>
+
+      <section id="focus-timer" class="widget">
+        <h2>⏱ Focus Timer</h2>
+        <div id="timerDisplay">25:00</div>
+        <div class="timer-controls">
+          <button id="startTimer">▶ Start</button>
+          <button id="resetTimer">⏹ Reset</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="{% static 'events/js/dashboard.js' %}"></script>
+</body>
+</html>

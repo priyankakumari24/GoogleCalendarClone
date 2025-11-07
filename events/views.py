@@ -3,16 +3,19 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 import calendar, json, requests
-
 from .models import Event
 from rest_framework import viewsets
 from .serializers import EventSerializer
 
 
 # ------------------------------
-# 1️⃣ Calendar View (renders HTML)
+# 1️⃣ Main Calendar + Dashboard Page
 # ------------------------------
-def calendar_view(request):
+def calendar_dashboard(request):
+    """
+    Renders the unified Calendar + Smart Dashboard view.
+    Replaces old `calendar_view` and `dashboard_view`.
+    """
     now = datetime.now()
     year = now.year
     month = now.month
@@ -25,7 +28,7 @@ def calendar_view(request):
         for day, weekday in month_days if day != 0
     ]
 
-    return render(request, 'events/calendar.html', {
+    return render(request, 'events/calendar_dashboard.html', {
         'month_name': calendar.month_name[month],
         'year': year,
         'days': days
@@ -33,7 +36,7 @@ def calendar_view(request):
 
 
 # ------------------------------
-# 2️⃣ Optional DRF ViewSet
+# 2️⃣ DRF ViewSet (Optional)
 # ------------------------------
 class EventViewSet(viewsets.ModelViewSet):
     queryset = Event.objects.all()
@@ -41,10 +44,10 @@ class EventViewSet(viewsets.ModelViewSet):
 
 
 # ------------------------------
-# 3️⃣ Helper: get holidays for a given year
+# 3️⃣ Helper: Get Indian holidays for a given year
 # ------------------------------
 def get_indian_holidays_for_year(year: int):
-    """Fetch Indian holidays from API or fallback list."""
+    """Fetch Indian holidays via API or fallback list."""
     holidays_url = f"https://date.nager.at/api/v3/PublicHolidays/{year}/IN"
     holidays = []
 
@@ -57,7 +60,7 @@ def get_indian_holidays_for_year(year: int):
     except Exception as e:
         print(f"🌐 Error fetching holidays for {year}: {e}")
 
-    # If API fails or empty, use fallback
+    # Fallback if API fails
     if not holidays:
         holidays = [
             {"localName": "Republic Day", "date": f"{year}-01-26"},
@@ -68,7 +71,7 @@ def get_indian_holidays_for_year(year: int):
             {"localName": "Christmas", "date": f"{year}-12-25"},
         ]
 
-    # Convert to frontend event format
+    # Format for frontend
     formatted = [
         {
             "title": f"🇮🇳 {h['localName']}",
@@ -82,62 +85,68 @@ def get_indian_holidays_for_year(year: int):
 
 
 # ------------------------------
-# 4️⃣ Unified endpoint for all events
+# 4️⃣ Unified Events Endpoint
 # ------------------------------
 def event_list(request):
-    """Return all events (user + Indian holidays) for visible calendar range."""
+    """
+    Return combined list of user events + Indian holidays
+    for the visible calendar range.
+    """
     print("🟢 Processing /api/events request")
 
-    # 🗓 Handle query params from FullCalendar
+    # Handle calendar date range
     start = request.GET.get('start')
     end = request.GET.get('end')
 
     start_year = datetime.fromisoformat(start).year if start else datetime.now().year
     end_year = datetime.fromisoformat(end).year if end else start_year
 
-    # 🧩 Fetch DB events
+    # User-created events
     db_events = [
         {
             'id': e.id,
             'title': e.title,
             'start': e.start.isoformat(),
             'end': e.end.isoformat(),
-            'allDay': e.all_day
+            'allDay': e.all_day,
+            'color': getattr(e, 'color', '#4285f4')
         }
         for e in Event.objects.all()
     ]
     print(f"🟢 Found {len(db_events)} user events")
 
-    # 🌐 Fetch Indian holidays for all years in range
+    # Fetch Indian holidays
     all_holidays = []
     for year in range(start_year, end_year + 1):
         all_holidays.extend(get_indian_holidays_for_year(year))
 
-    # ✅ Combine and return
+    # Combine
     data = db_events + all_holidays
     print(f"✅ Returning total events: {len(data)}")
     return JsonResponse(data, safe=False)
 
 
 # ------------------------------
-# 5️⃣ CRUD for custom user events
+# 5️⃣ CRUD Endpoints for Events
 # ------------------------------
 @csrf_exempt
 def event_create(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         event = Event.objects.create(
-            title=data['title'],
+            title=data.get('title', 'Untitled Event'),
             start=data['start'],
             end=data.get('end', data['start']),
-            all_day=data.get('all_day', True)
+            all_day=data.get('allDay', True),
+            color=data.get('color', '#4285f4')
         )
         return JsonResponse({
             'id': event.id,
             'title': event.title,
             'start': event.start.isoformat(),
             'end': event.end.isoformat(),
-            'allDay': event.all_day
+            'allDay': event.all_day,
+            'color': event.color,
         })
 
 
@@ -151,6 +160,19 @@ def event_delete(request, pk):
         except Event.DoesNotExist:
             return JsonResponse({'error': 'Event not found'}, status=404)
 
-def dashboard_view(request):
-    """Render the Smart Calendar Dashboard"""
-    return render(request, 'events/dashboard.html')
+
+@csrf_exempt
+def event_update(request, pk):
+    """Handle PUT requests for event update (drag, resize, edit)."""
+    if request.method == 'PUT':
+        try:
+            event = Event.objects.get(pk=pk)
+            data = json.loads(request.body)
+            event.start = data.get('start', event.start)
+            event.end = data.get('end', event.end)
+            event.all_day = data.get('allDay', event.all_day)
+            event.color = data.get('color', event.color)
+            event.save()
+            return JsonResponse({'success': True})
+        except Event.DoesNotExist:
+            return JsonResponse({'error': 'Event not found'}, status=404)

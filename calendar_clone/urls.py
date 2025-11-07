@@ -25,8 +25,7 @@ router.register(r'events', views.EventViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('dashboard/', views.dashboard_view, name='dashboard'),
-    path('', views.calendar_view, name='calendar'),
+    path('', views.calendar_dashboard, name='calendar_dashboard'),
     path('api/events/', views.event_list, name='event_list'),
     path('api/events/create/', views.event_create, name='event_create'),
     path('api/events/<int:pk>/delete/', views.event_delete, name='event_delete'),

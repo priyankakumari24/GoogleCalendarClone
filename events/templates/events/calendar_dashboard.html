@@ -1,0 +1,106 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Calendar Dashboard</title>
+
+  <!-- External Libraries -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+
+  <!-- Single Combined CSS -->
+  <link rel="stylesheet" href="{% static 'events/css/calendar_dashboard.css' %}">
+</head>
+
+<body>
+  <div class="main-wrapper">
+
+    <!-- 🔹 Left Sidebar -->
+    <aside class="sidebar">
+      <h2>📆 Calendar</h2>
+      <div class="controls">
+        <button id="createEventBtn" class="create-btn">+ Create</button>
+      </div>
+
+      <input id="searchInput" class="search-box" type="search" placeholder="Search events..." />
+
+      <div class="mini-legend">
+        <div class="badge bg-primary">Work</div>
+        <div class="badge bg-success">Personal</div>
+        <div class="badge" style="background:#fbbc04;color:black">Holiday</div>
+        <div class="badge bg-secondary">Other</div>
+      </div>
+
+      <div class="month-title" id="monthTitle"></div>
+      <div id="miniCalendar"></div>
+
+      <hr>
+      <div class="weather-box">
+        <h6>Weather (selected day)</h6>
+        <div id="weatherLoading">Select a day to load weather</div>
+      </div>
+    </aside>
+
+    <!-- 🔹 Center Calendar -->
+    <main class="calendar-container">
+      <div id="calendar"></div>
+    </main>
+
+    <!-- 🔹 Right Smart Dashboard -->
+    <aside class="dashboard">
+      <header>
+        <h3>🧠 Smart Dashboard</h3>
+        <p>Insights powered by your events</p>
+      </header>
+
+      <section id="upcoming-events" class="widget">
+        <h4>🗓 Upcoming Events</h4>
+        <ul id="upcomingList"><li>Loading...</li></ul>
+      </section>
+
+      <section id="today-timeline" class="widget">
+        <h4>🕒 Today’s Schedule</h4>
+        <ul id="todayList"><li>No events yet</li></ul>
+      </section>
+
+      <section id="smart-suggestions" class="widget">
+        <h4>💡 Smart Suggestions</h4>
+        <ul id="suggestionsList"><li>Analyzing...</li></ul>
+      </section>
+
+      <section id="quick-add" class="widget">
+        <h4>⚡ Quick Add</h4>
+        <input type="text" id="quickAddInput" class="form-control" placeholder="e.g. Meeting tomorrow 3pm">
+        <button id="quickAddBtn" class="btn btn-primary w-100 mt-2">+ Add Event</button>
+      </section>
+
+      <section id="notifications" class="widget">
+        <h4>🔔 Notifications</h4>
+        <ul id="notificationsList"><li>No recent updates</li></ul>
+      </section>
+
+      <section id="focus-timer" class="widget">
+        <h4>⏱ Focus Timer</h4>
+        <div id="timerDisplay">25:00</div>
+        <div class="timer-controls mt-2">
+          <button id="startTimer" class="btn btn-success btn-sm">▶ Start</button>
+          <button id="resetTimer" class="btn btn-outline-danger btn-sm">⏹ Reset</button>
+        </div>
+      </section>
+    </aside>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer"></div>
+
+  <!-- External JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <!-- Combined Single JS -->
+  <script src="{% static 'events/js/calendar_dashboard.js' %}"></script>
+</body>
+</html>
